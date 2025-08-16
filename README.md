@@ -107,7 +107,7 @@ Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -For
 **Body de exemplo** 
 ```json
 {
-  "ingredients": ["tomato", "cheese", "pasta"],
+  "ingredients": ["tomate", "queijo", "macarrão"],
   "servings": 2,
   "style": "gourmet",
   "diet": "vegetarian"
@@ -117,15 +117,57 @@ Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -For
 **Resposta** 
 ```json
 {
-  "title": "Pasta alla Chef",
-  "servings": 2,
-  "time_minutes": 25,
-  "ingredients_used": ["tomato", "cheese", "pasta"],
-  "steps": ["Boil pasta", "Prepare sauce", "Mix and serve"],
-  "tips": ["Use fresh cheese for better taste"],
-  "warnings": []
+    "title": "Macarrão ao Molho de Tomate e Queijo",
+    "servings": 2,
+    "time_minutes": 25,
+    "ingredients_used": [
+        "200g de macarrão",
+        "2 tomates maduros",
+        "100g de queijo (pode ser muçarela ou queijo parmesão)"
+    ],
+    "steps": [
+        "1. Cozinhe o macarrão em água salgada fervente até ficar al dente, seguindo as instruções da embalagem.",
+        "2. Enquanto o macarrão cozinha, lave os tomates e corte-os em cubos pequenos.",
+        "3. Em uma panela, adicione um fio de azeite e refogue os tomates em fogo médio até que comecem a desmanchar, cerca de 5 minutos.",
+        "4. Adicione o macarrão cozido à panela com os tomates e misture bem. Se necessário, acrescente um pouco da água do cozimento para soltar o molho.",
+        "5. Rale o queijo e adicione à mistura, mexendo até derreter e incorporar ao molho.",
+        "6. Tempere com sal e pimenta a gosto e sirva quente."
+    ],
+    "tips": [
+        "Para um toque especial, adicione manjericão fresco ou orégano ao molho.",
+        "Se preferir um molho mais cremoso, adicione um pouco de creme de leite ou uma colher de sopa de manteiga no final."
+    ],
+    "warnings": [
+        "Certifique-se de cozinhar o macarrão até que esteja completamente cozido.",
+        "Verifique se você não tem alergia a algum dos ingredientes, especialmente ao queijo."
+    ]
 }
 ```
+---
+## ⚠️ Limitação Arquitetural
+
+Atualmente, a API segue um fluxo **síncrono**:
+
+| #  | Componente      | Ação                         |
+|----|----------------|-------------------------------|
+| 1  | Cliente        | Envia requisição HTTP         |
+| 2  | API Gateway    | Roteia para Lambda            |
+| 3  | Lambda         | Processa entrada              |
+| 4  | ChatGPT API    | Gera conteúdo (7,5s)          |
+| 5  | Lambda         | Formata resposta              |
+| 6  | API Gateway    | Retorna HTTP                  |
+| 7  | Cliente        | Recebe resposta               |
+
+
+- A Lambda fica bloqueada aguardando a resposta do ChatGPT.  
+- Tempo médio de resposta: ~7,5 segundos por requisição.  
+- Isso aumenta tanto o custo (Lambda cobra por duração) quanto o tempo de espera do usuário.  
+
+### 🔮 Para reduzir custos e melhorar a experiência:
+- Adotar processamento **assíncrono** (ex.: SQS + Lambda Worker).  
+- Usar **Step Functions** para orquestrar fluxos mais longos.  
+- Implementar **cache** em DynamoDB ou S3 para receitas populares.  
+- Explorar **respostas em streaming** quando disponível no API Gateway.  
 
 
 
