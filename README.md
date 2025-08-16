@@ -59,7 +59,7 @@ zip -r function.zip index.mjs package.json
 Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -Force
 ```
 
---
+---
 ## 2. Criar função Lambda
 
 1. **Acesse o [Console AWS Lambda](https://console.aws.amazon.com/lambda/)**
