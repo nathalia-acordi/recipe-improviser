@@ -11,3 +11,6 @@ function json(status, data) {
         body: JSON.stringify(data)
     };
 }
+
+const STYLES = new Set(["simple", "funny", "gourmet", "chaotic"]);
+const DIETS = new Set(["none", "vegan", "vegetarian", "gluten_free", "lactose_free", "low_cost"]);
