@@ -45,3 +45,42 @@ function buildUserPrompt({ ingredients, servings }) {
 Porções (servings): ${servings || 2}
 Gere UMA receita que caiba em ~20-30 minutos, com 4-8 passos.`;
 }
+
+async function callOpenAI({ style, diet, ingredients, servings }) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OPENAI_API_KEY ausente");
+}
+
+const controller = new AbortController();
+const t = setTimeout(() => controller.abort(), 8000);
+
+try {
+    const payload = {
+        model: "gpt-4o-mini",
+        messages: [
+            { role: "system", content: buildSystemPrompt({ style, diet }) },
+            { role: "user", content: buildUserPrompt({ ingredients, servings }) }
+        ],
+        temperature: style === "funny" || style === "chaotic" ? 0.9 : style === "gourmet" ? 0.7 : 0.4,
+        max_tokens: 500
+    };
+
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+    });
+
+    if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new Error(`OpenAI error: ${res.status} ${msg}`);
+    }
+
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content?.trim() || "{}";
+    const cleaned = text.replace(/```json|```/g, "");
+    return JSON.parse(cleaned);
+} finally {
+    clearTimeout(t);
+}
