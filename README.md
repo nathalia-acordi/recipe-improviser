@@ -1,4 +1,4 @@
-# 🍳 Recipe Improviser – API Serverless com ChatGPT
+# Recipe Improviser – API Serverless com ChatGPT
 Uma **API serverless** construída com **AWS Lambda + API Gateway**, capaz de gerar receitas culinárias com base nos ingredientes informados pelo usuário.  
 A geração das receitas utiliza a **API do OpenAI (ChatGPT)** com diferentes estilos e restrições alimentares.  
 
@@ -8,17 +8,17 @@ Projeto desenvolvido como exemplo prático de integração entre **Serverless + 
 
 ## 📑 Sumário
 
-1. [✨ Funcionalidades](#-funcionalidades)  
-2. [🛠️ Pré-requisitos](#️-pré-requisitos)  
-3. [🚀 Deploy na AWS Lambda](#-deploy-na-aws-lambda)  
-4. [📡 Endpoints da API](#-endpoints-da-api)  
+1. [Funcionalidades](#-funcionalidades)  
+2. [Pré-requisitos](#️-pré-requisitos)  
+3. [Deploy na AWS Lambda](#-deploy-na-aws-lambda)  
+4. [Endpoints da API](#-endpoints-da-api)  
    - [Healthcheck](#healthcheck)  
    - [Gerar Receita](#gerar-receita)  
-5. [⚠️ Limitação Arquitetural](#️-limitação-arquitetural) 
+5. [Limitação Arquitetural](#️-limitação-arquitetural) 
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - ✅ Geração de receitas a partir de ingredientes informados  
 - ✅ Suporte a **estilos** (simple, funny, gourmet, chaotic)  
@@ -29,7 +29,7 @@ Projeto desenvolvido como exemplo prático de integração entre **Serverless + 
 
 ---
 
-## 🛠️ Pré-requisitos
+## Pré-requisitos
 
 Antes de começar, você precisa ter:  
 
@@ -40,7 +40,7 @@ Antes de começar, você precisa ter:
 
 ---
 
-## 🚀 Deploy na AWS Lambda
+## Deploy na AWS Lambda
 1. [Empacotar código](#1-empacotar-para-deploy)
 2. [Criar função Lambda](#2-criar-função-lambda)
 3. [Configurar API Gateway](#3-configurar-api-gateway)
@@ -64,7 +64,7 @@ Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -For
 
 1. **Acesse o [Console AWS Lambda](https://console.aws.amazon.com/lambda/)**
 2. **Create function** → "Author from scratch":
-   - 🔧 **Runtime**: Node.js 18.x
+   - 🔧 **Runtime**: Node.js 22.x
    - 📛 **Nome**: `recipe-improviser`
 3. **Upload do pacote**:
    - Selecione "Upload from" → ".zip file"
@@ -144,7 +144,7 @@ Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -For
 }
 ```
 ---
-## ⚠️ Limitação Arquitetural
+## Limitação Arquitetural
 
 Atualmente, a API segue um fluxo **síncrono**:
 
@@ -163,7 +163,7 @@ Atualmente, a API segue um fluxo **síncrono**:
 - Tempo médio de resposta: ~7,5 segundos por requisição.  
 - Isso aumenta tanto o custo (Lambda cobra por duração) quanto o tempo de espera do usuário.  
 
-### 🔮 Para reduzir custos e melhorar a experiência:
+### Para reduzir custos e melhorar a experiência:
 - Adotar processamento **assíncrono** (ex.: SQS + Lambda Worker).  
 - Usar **Step Functions** para orquestrar fluxos mais longos.  
 - Implementar **cache** em DynamoDB ou S3 para receitas populares.  
