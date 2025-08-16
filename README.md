@@ -52,10 +52,12 @@ Antes de começar, você precisa ter:
 ### macOS/Linux
 ```bash
 zip -r function.zip index.mjs package.json
+```
 
 ### Windows (PowerShell)
 ```bash
 Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -Force
+```
 
 --
 ## 2. Criar função Lambda
@@ -83,6 +85,47 @@ Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -For
    - `POST /recipe` (endpoint principal)
 4. Após criação:
    - Anote a **URL de invocação** (ex: `https://[id].execute-api.[region].amazonaws.com`)
+
+---
+## 📡 Endpoints da API
+
+### Healthcheck
+
+**Método:** `GET`  
+**Endpoint:** `/health`  
+**Resposta:** 
+```json
+{
+  "ok": true
+}
+```
+
+### Gerar Receita
+
+**Método:** `POST`  
+**Endpoint:** `/recipe`    
+**Body de exemplo** 
+```json
+{
+  "ingredients": ["tomato", "cheese", "pasta"],
+  "servings": 2,
+  "style": "gourmet",
+  "diet": "vegetarian"
+}
+```
+
+**Resposta** 
+```json
+{
+  "title": "Pasta alla Chef",
+  "servings": 2,
+  "time_minutes": 25,
+  "ingredients_used": ["tomato", "cheese", "pasta"],
+  "steps": ["Boil pasta", "Prepare sauce", "Mix and serve"],
+  "tips": ["Use fresh cheese for better taste"],
+  "warnings": []
+}
+```
 
 
 
