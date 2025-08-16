@@ -1,0 +1,6 @@
+{
+  "name": "recipe-improviser",
+  "version": "1.0.0",
+  "description": "Serverless API built with AWS Lambda and API Gateway that generates personalized recipes based on ingredients using ChatGPT integration.",
+  "author": "Nathália Acordi"
+}
