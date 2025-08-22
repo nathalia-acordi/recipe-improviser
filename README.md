@@ -51,12 +51,12 @@ Antes de começar, você precisa ter:
 
 ### macOS/Linux
 ```bash
-zip -r function.zip index.mjs package.json
+zip -r function.zip index.mjs, openai.mjs, utils.mjs
 ```
 
 ### Windows (PowerShell)
 ```bash
-Compress-Archive -Path index.mjs,package.json -DestinationPath function.zip -Force
+Compress-Archive -Path index.mjs, openai.mjs, utils.mjs -DestinationPath function.zip -Force
 ```
 
 ---
