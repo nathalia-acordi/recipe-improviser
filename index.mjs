@@ -46,7 +46,6 @@ export const handler = async (event) => {
   }
 
   const servings = Number(body.servings || 2);
-
   const style = (body.style || "simple").toLowerCase();
   const diet = (body.diet || "none").toLowerCase();
 
@@ -65,7 +64,7 @@ export const handler = async (event) => {
   if (rawSize > 600) {
     return json(413, {
       error: "Lista de ingredientes muito longa para a demo.",
-    }); // 413 = Payload Too Large
+    });
   }
 
   if (process.env.SKIP_OPENAI === "1") {

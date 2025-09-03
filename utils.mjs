@@ -5,14 +5,15 @@ export const CORS = {
 }
 
 export function json(status, data, extraHeaders = {}) {
-    return new Response(JSON.stringify(data), {
-        status,
+    return {
+        statusCode: status,
         headers: {
             "Content-Type": "application/json",
             ...CORS,
             ...extraHeaders
-        }
-    });
+        },
+        body: JSON.stringify(data)
+    }
 }
 
 export const STYLES = new Set([

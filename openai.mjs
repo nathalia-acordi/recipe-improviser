@@ -23,6 +23,12 @@ function buildSystemPrompt({ style, diet }) {
 - Saída ESTRITAMENTE em JSON com chaves: title, servings, time_minutes, ingredients_used, steps, tips, warnings.`;
 }
 
+function buildUserPrompt({ ingredients, servings }) {
+  return `Ingredientes disponíveis: ${ingredients.join(", ")}
+Porções: ${servings || 2}
+Gere UMA receita que caiba em ~20-30 minutos, com 4-8 passos.`;
+}
+
 export async function callOpenAI({ style, diet, ingredients, servings }) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY ausente");
@@ -67,3 +73,5 @@ export async function callOpenAI({ style, diet, ingredients, servings }) {
     clearTimeout(t);
   }
 }
+
+
