@@ -6,18 +6,6 @@ Projeto desenvolvido como exemplo prático de integração entre **Serverless + 
 
 ---
 
-## 📑 Sumário
-
-1. [Funcionalidades](#-funcionalidades)  
-2. [Pré-requisitos](#️-pré-requisitos)  
-3. [Deploy na AWS Lambda](#-deploy-na-aws-lambda)  
-4. [Endpoints da API](#-endpoints-da-api)  
-   - [Healthcheck](#healthcheck)  
-   - [Gerar Receita](#gerar-receita)  
-5. [Limitação Arquitetural](#️-limitação-arquitetural) 
-
----
-
 ## Funcionalidades
 
 - ✅ Geração de receitas a partir de ingredientes informados  
