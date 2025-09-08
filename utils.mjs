@@ -26,7 +26,7 @@ export const STYLES = new Set([
 export const DIETS = new Set([
     "vegan",
     "vegetarian",
-    "gluten-free",
-    "low-cost",
-    "lactose-free"
+    "gluten_free",
+    "low_cost",
+    "lactose_free"
 ]);
