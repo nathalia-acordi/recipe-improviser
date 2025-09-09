@@ -1,29 +1,3 @@
-# Recipe Improviser – API Serverless com ChatGPT
-Uma **API serverless** construída com **AWS Lambda + API Gateway**, capaz de gerar receitas culinárias com base nos ingredientes informados pelo usuário.  
-A geração das receitas utiliza a **API do OpenAI (ChatGPT)** com diferentes estilos e restrições alimentares.  
-
-Projeto desenvolvido como exemplo prático de integração entre **Serverless + IA**.
-
----
-
-## Funcionalidades
-
-- ✅ Geração de receitas a partir de ingredientes informados  
-- ✅ Suporte a **estilos** (simple, funny, gourmet, chaotic)  
-- ✅ Endpoint de saúde (`GET /health`)  
-- ✅ Modo offline para testes (ignora chamada à OpenAI)  
-- ✅ Empacotamento simples em um único Lambda  
-
-## 🚀 Como usar
-
-### Pré-requisitos
-
-- Conta AWS (Lambda + API Gateway)
-- Node.js 18+
-- AWS CLI configurado (`aws configure`)
-- Chave da OpenAI (`OPENAI_API_KEY`)
-
-- **AWS CLI** configurado (`aws configure`)  
 <div align="center">
    <h1>🥘 <strong>Recipe Improviser</strong></h1>
    <p>Gere receitas criativas a partir dos ingredientes que você tem em casa!<br>
