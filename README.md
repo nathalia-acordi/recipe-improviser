@@ -178,16 +178,19 @@ Para produção, considere:
 > <b>Veja também:</b><br>
 > No repositório <a href="https://github.com/nathalia-acordi/recipe-improviser-pipeline/" target="_blank"><b>recipe-improviser-pipeline</b></a> demonstro como resolver esse problema usando uma arquitetura assíncrona, tornando o fluxo mais escalável e eficiente para grandes volumes e respostas demoradas.
 
-<hr/>
-
-## 👩‍💻 Contribua
-
+<hr>
 <div align="center">
-Sugestões, issues e PRs são super bem-vindos!<br/>
-<a href="https://github.com/nathalia-acordi/recipe-improviser">⭐ Dê uma estrela no projeto!</a>
+   <h3>💬 Ficou com dúvidas, quer trocar ideias ou colaborar?</h3>
+   <b>Entre em contato comigo!</b><br><br>
+   <a href="mailto:nathaliaccord@gmail.com" target="_blank">
+      <img src="https://img.shields.io/badge/E--mail-nathaliaccord@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="E-mail Badge"/>
+   </a>
+   <a href="https://www.linkedin.com/in/nath%C3%A1lia-acordi-0a564b223/" target="_blank">
+      <img src="https://img.shields.io/badge/LinkedIn-Nathália%20Acordi-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
+   </a>
+   <br><br>
+   Se curtiu o projeto, dê uma estrela! ⭐
 </div>
-
-<hr/>
-
+</hr>
 
 
