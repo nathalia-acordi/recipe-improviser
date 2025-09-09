@@ -1,4 +1,29 @@
+# Recipe Improviser – API Serverless com ChatGPT
+Uma **API serverless** construída com **AWS Lambda + API Gateway**, capaz de gerar receitas culinárias com base nos ingredientes informados pelo usuário.  
+A geração das receitas utiliza a **API do OpenAI (ChatGPT)** com diferentes estilos e restrições alimentares.  
 
+Projeto desenvolvido como exemplo prático de integração entre **Serverless + IA**.
+
+---
+
+## Funcionalidades
+
+- ✅ Geração de receitas a partir de ingredientes informados  
+- ✅ Suporte a **estilos** (simple, funny, gourmet, chaotic)  
+- ✅ Endpoint de saúde (`GET /health`)  
+- ✅ Modo offline para testes (ignora chamada à OpenAI)  
+- ✅ Empacotamento simples em um único Lambda  
+
+## 🚀 Como usar
+
+### Pré-requisitos
+
+- Conta AWS (Lambda + API Gateway)
+- Node.js 18+
+- AWS CLI configurado (`aws configure`)
+- Chave da OpenAI (`OPENAI_API_KEY`)
+
+- **AWS CLI** configurado (`aws configure`)  
 <div align="center">
    <h1>🥘 <strong>Recipe Improviser</strong></h1>
    <p>Gere receitas criativas a partir dos ingredientes que você tem em casa!<br>
@@ -138,14 +163,43 @@ zip -r function.zip index.mjs openai.mjs utils.mjs
 
 <hr/>
 
+
 ## ⚠️ Limitações e Dicas
 
-- O processamento é <b>síncrono</b>: a Lambda aguarda a resposta do ChatGPT (~7,5s).
-- Para produção, considere:
-   - Processamento assíncrono (SQS + Lambda Worker)
-   - Orquestração com Step Functions
-   - Cache de receitas populares (DynamoDB/S3)
-   - Streaming de respostas (quando disponível)
+### Fluxo Síncrono Atual
+
+```mermaid
+flowchart TD
+      A[Usuário] -->|1. Envia requisição HTTP| B(API Gateway)
+      B -->|2. Roteia| C(Lambda)
+      C -->|3. Processa entrada| D(OpenAI API)
+      D -->|4. Gera receita| C
+      C -->|5. Formata resposta| B
+      B -->|6. Retorna HTTP| A
+    
+      subgraph Problema
+         C
+         D
+      end
+      Problema:::warning
+
+      classDef warning fill:#fff3cd,stroke:#e0a800,stroke-width:2px;
+```
+
+<details>
+<summary><b>Por que isso é um problema?</b></summary>
+
+- A função Lambda fica <b>bloqueada</b> esperando a resposta do ChatGPT (média ~7,5s).
+- Isso aumenta o <b>custo</b> (Lambda cobra por duração) e o <b>tempo de espera</b> do usuário.
+- Para grandes volumes, pode causar lentidão e esgotar recursos.
+
+</details>
+
+Para produção, considere:
+- Processamento assíncrono (SQS + Lambda Worker)
+- Orquestração com Step Functions
+- Cache de receitas populares (DynamoDB/S3)
+- Streaming de respostas (quando disponível)
 
 > <b>Veja também:</b><br>
 > No repositório <a href="https://github.com/nathalia-acordi/recipe-improviser-pipeline/" target="_blank"><b>recipe-improviser-pipeline</b></a> demonstro como resolver esse problema usando uma arquitetura assíncrona, tornando o fluxo mais escalável e eficiente para grandes volumes e respostas demoradas.
