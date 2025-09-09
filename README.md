@@ -1,161 +1,165 @@
-# Recipe Improviser – API Serverless com ChatGPT
-Uma **API serverless** construída com **AWS Lambda + API Gateway**, capaz de gerar receitas culinárias com base nos ingredientes informados pelo usuário.  
-A geração das receitas utiliza a **API do OpenAI (ChatGPT)** com diferentes estilos e restrições alimentares.  
 
-Projeto desenvolvido como exemplo prático de integração entre **Serverless + IA**.
+<div align="center">
+   <h1>🥘 <strong>Recipe Improviser</strong></h1>
+   <p>Gere receitas criativas a partir dos ingredientes que você tem em casa!<br>
+   <b>API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI).</b></p>
+</div>
 
----
+<hr/>
 
-## Funcionalidades
+## ✨ Funcionalidades
 
-- ✅ Geração de receitas a partir de ingredientes informados  
-- ✅ Suporte a **estilos** (simple, funny, gourmet, chaotic)  
-- ✅ Suporte a **restrições alimentares** (vegan, vegetarian, gluten-free, lactose-free, low-cost)  
-- ✅ Endpoint de saúde (`GET /health`)  
-- ✅ Modo offline para testes (ignora chamada à OpenAI)  
-- ✅ Empacotamento simples em um único Lambda  
+- 🍳 <b>Geração de receitas</b> a partir de ingredientes informados
+- 🎭 <b>Estilos:</b> <code>simple</code>, <code>funny</code>, <code>gourmet</code>, <code>chaotic</code>
+- 🥦 <b>Restrições alimentares:</b> <code>vegan</code>, <code>vegetarian</code>, <code>gluten-free</code>, <code>lactose-free</code>, <code>low-cost</code>
+- 🩺 <b>Endpoint de saúde:</b> <code>GET /health</code>
+- 🧪 <b>Modo offline</b> para testes (ignora chamada à OpenAI)
+- 📦 <b>Deploy simples</b> em um único Lambda
 
----
+<hr/>
 
-## Pré-requisitos
+## 🚀 Como usar
 
-Antes de começar, você precisa ter:  
+### Pré-requisitos
 
-- Conta na **AWS** (Lambda + API Gateway)  
-- **Node.js 18+** instalado  
-- **AWS CLI** configurado (`aws configure`)  
-- Chave da **API OpenAI** configurada como variável de ambiente:  
+- ☁️ Conta AWS (Lambda + API Gateway)
+- 🟩 Node.js 18+
+- 🤖 Chave da OpenAI (<code>OPENAI_API_KEY</code>)
 
----
+### Deploy
 
-## Deploy na AWS Lambda
-1. [Empacotar código](#1-empacotar-para-deploy)
-2. [Criar função Lambda](#2-criar-função-lambda)
-3. [Configurar API Gateway](#3-configurar-api-gateway)
+<details>
+<summary><b>1. Empacote o código</b></summary>
 
----
+<b>Windows (PowerShell):</b>
 
-### 1. Empacotar para deploy
-
-### macOS/Linux
-```bash
-zip -r function.zip index.mjs, openai.mjs, utils.mjs
-```
-
-### Windows (PowerShell)
-```bash
+```powershell
 Compress-Archive -Path index.mjs, openai.mjs, utils.mjs -DestinationPath function.zip -Force
 ```
 
----
-## 2. Criar função Lambda
+<b>macOS/Linux:</b>
 
-1. **Acesse o [Console AWS Lambda](https://console.aws.amazon.com/lambda/)**
-2. **Create function** → "Author from scratch":
-   - 🔧 **Runtime**: Node.js 22.x
-   - 📛 **Nome**: `recipe-improviser`
-3. **Upload do pacote**:
-   - Selecione "Upload from" → ".zip file"
-   - Escolha o arquivo `function.zip` criado anteriormente
-4. **Configurar variáveis de ambiente**:
-   - `OPENAI_API_KEY`: sua chave da OpenAI
-   - (Opcional) `SKIP_OPENAI`: `1` para modo de teste
+```bash
+zip -r function.zip index.mjs openai.mjs utils.mjs
+```
+</details>
 
-## 3. Configurar API Gateway
+<details>
+<summary><b>2. Crie a função Lambda</b></summary>
+
+1. Acesse o <a href="https://console.aws.amazon.com/lambda/" target="_blank"><b>Console AWS Lambda</b></a>
+2. <b>Create function</b> → "Author from scratch":
+    - 🔧 <b>Runtime:</b> Node.js 22.x
+    - 📛 <b>Nome:</b> <code>recipe-improviser</code>
+3. <b>Upload do pacote:</b>
+    - Selecione "Upload from" → ".zip file"
+    - Escolha o arquivo <code>function.zip</code> criado anteriormente
+4. <b>Configurar variáveis de ambiente:</b>
+    - <code>OPENAI_API_KEY</code>: sua chave da OpenAI
+    - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
+</details>
+
+<details>
+<summary><b>3. Configure o API Gateway</b></summary>
 
 1. Na função Lambda criada:
-   - Clique em **Add trigger**
-2. Selecione **API Gateway**:
-   - **Tipo**: HTTP API
-   - **Segurança**: Open (para desenvolvimento)
-3. **Configurar rotas**:
-   - `GET /health` (healthcheck)
-   - `POST /recipe` (endpoint principal)
+    - Clique em <b>Add trigger</b>
+2. Selecione <b>API Gateway</b>:
+    - <b>Tipo:</b> HTTP API
+    - <b>Segurança:</b> Open (para desenvolvimento)
+3. <b>Configurar rotas:</b>
+    - <code>GET /health</code> (healthcheck)
+    - <code>POST /recipe</code> (endpoint principal)
 4. Após criação:
-   - Anote a **URL de invocação** (ex: `https://[id].execute-api.[region].amazonaws.com`)
+    - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
+</details>
 
----
-## 📡 Endpoints da API
+<hr/>
 
-### Healthcheck
+## 📡 Endpoints
 
-**Método:** `GET`  
-**Endpoint:** `/health`  
-**Resposta:** 
+### 🩺 Healthcheck
+
+- <b>Método:</b> <code>GET</code>
+- <b>Endpoint:</b> <code>/health</code>
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{ "ok": true }
+```
+</details>
+
+### 🍲 Gerar Receita
+
+- <b>Método:</b> <code>POST</code>
+- <b>Endpoint:</b> <code>/recipe</code>
+
+<details>
+<summary><b>Body de exemplo</b></summary>
+
 ```json
 {
-  "ok": true
+   "ingredients": ["tomate", "queijo", "macarrão"],
+   "servings": 2,
+   "style": "gourmet",
+   "diet": "vegetarian"
 }
 ```
+</details>
 
-### Gerar Receita
+<details>
+<summary><b>Resposta</b></summary>
 
-**Método:** `POST`  
-**Endpoint:** `/recipe`    
-**Body de exemplo** 
 ```json
 {
-  "ingredients": ["tomate", "queijo", "macarrão"],
-  "servings": 2,
-  "style": "gourmet",
-  "diet": "vegetarian"
+   "title": "Macarrão ao Molho de Tomate e Queijo",
+   "servings": 2,
+   "time_minutes": 25,
+   "ingredients_used": [
+      "200g de macarrão",
+      "2 tomates maduros",
+      "100g de queijo (pode ser muçarela ou queijo parmesão)"
+   ],
+   "steps": [
+      "1. Cozinhe o macarrão em água salgada fervente até ficar al dente...",
+      "...etc"
+   ],
+   "tips": [
+      "Para um toque especial, adicione manjericão fresco ou orégano ao molho."
+   ],
+   "warnings": [
+      "Certifique-se de cozinhar o macarrão até que esteja completamente cozido."
+   ]
 }
 ```
+</details>
 
-**Resposta** 
-```json
-{
-    "title": "Macarrão ao Molho de Tomate e Queijo",
-    "servings": 2,
-    "time_minutes": 25,
-    "ingredients_used": [
-        "200g de macarrão",
-        "2 tomates maduros",
-        "100g de queijo (pode ser muçarela ou queijo parmesão)"
-    ],
-    "steps": [
-        "1. Cozinhe o macarrão em água salgada fervente até ficar al dente, seguindo as instruções da embalagem.",
-        "2. Enquanto o macarrão cozinha, lave os tomates e corte-os em cubos pequenos.",
-        "3. Em uma panela, adicione um fio de azeite e refogue os tomates em fogo médio até que comecem a desmanchar, cerca de 5 minutos.",
-        "4. Adicione o macarrão cozido à panela com os tomates e misture bem. Se necessário, acrescente um pouco da água do cozimento para soltar o molho.",
-        "5. Rale o queijo e adicione à mistura, mexendo até derreter e incorporar ao molho.",
-        "6. Tempere com sal e pimenta a gosto e sirva quente."
-    ],
-    "tips": [
-        "Para um toque especial, adicione manjericão fresco ou orégano ao molho.",
-        "Se preferir um molho mais cremoso, adicione um pouco de creme de leite ou uma colher de sopa de manteiga no final."
-    ],
-    "warnings": [
-        "Certifique-se de cozinhar o macarrão até que esteja completamente cozido.",
-        "Verifique se você não tem alergia a algum dos ingredientes, especialmente ao queijo."
-    ]
-}
-```
----
-## Limitação Arquitetural
+<hr/>
 
-Atualmente, a API segue um fluxo **síncrono**:
+## ⚠️ Limitações e Dicas
 
-| #  | Componente      | Ação                         |
-|----|----------------|-------------------------------|
-| 1  | Cliente        | Envia requisição HTTP         |
-| 2  | API Gateway    | Roteia para Lambda            |
-| 3  | Lambda         | Processa entrada              |
-| 4  | ChatGPT API    | Gera conteúdo (7,5s)          |
-| 5  | Lambda         | Formata resposta              |
-| 6  | API Gateway    | Retorna HTTP                  |
-| 7  | Cliente        | Recebe resposta               |
+- O processamento é <b>síncrono</b>: a Lambda aguarda a resposta do ChatGPT (~7,5s).
+- Para produção, considere:
+   - Processamento assíncrono (SQS + Lambda Worker)
+   - Orquestração com Step Functions
+   - Cache de receitas populares (DynamoDB/S3)
+   - Streaming de respostas (quando disponível)
 
+> <b>Veja também:</b><br>
+> No repositório <a href="https://github.com/nathalia-acordi/recipe-improviser-pipeline/" target="_blank"><b>recipe-improviser-pipeline</b></a> demonstro como resolver esse problema usando uma arquitetura assíncrona, tornando o fluxo mais escalável e eficiente para grandes volumes e respostas demoradas.
 
-- A Lambda fica bloqueada aguardando a resposta do ChatGPT.  
-- Tempo médio de resposta: ~7,5 segundos por requisição.  
-- Isso aumenta tanto o custo (Lambda cobra por duração) quanto o tempo de espera do usuário.  
+<hr/>
 
-### Para reduzir custos e melhorar a experiência:
-- Adotar processamento **assíncrono** (ex.: SQS + Lambda Worker).  
-- Usar **Step Functions** para orquestrar fluxos mais longos.  
-- Implementar **cache** em DynamoDB ou S3 para receitas populares.  
-- Explorar **respostas em streaming** quando disponível no API Gateway.  
+## 👩‍💻 Contribua
+
+<div align="center">
+Sugestões, issues e PRs são super bem-vindos!<br/>
+<a href="https://github.com/nathalia-acordi/recipe-improviser">⭐ Dê uma estrela no projeto!</a>
+</div>
+
+<hr/>
 
 
 
