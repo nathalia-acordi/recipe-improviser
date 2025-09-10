@@ -1,7 +1,7 @@
 <div align="center">
    <h1>🥘 <strong>Recipe Improviser</strong></h1>
    <p>Gere receitas criativas a partir dos ingredientes que você tem em casa!<br>
-   <b>API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI).</b></p>
+   <b>API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persistência automática no MongoDB.</b></p>
 </div>
 
 <hr/>
@@ -13,6 +13,7 @@
 - 🥦 <b>Restrições alimentares:</b> <code>vegan</code>, <code>vegetarian</code>, <code>gluten-free</code>, <code>lactose-free</code>, <code>low-cost</code>
 - 🩺 <b>Endpoint de saúde:</b> <code>GET /health</code>
 - 🧪 <b>Modo offline</b> para testes (ignora chamada à OpenAI)
+- 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
 
 <hr/>
@@ -24,6 +25,7 @@
 - ☁️ Conta AWS (Lambda + API Gateway)
 - 🟩 Node.js 18+
 - 🤖 Chave da OpenAI (<code>OPENAI_API_KEY</code>)
+- 🍃 Instância ou cluster MongoDB acessível pela Lambda (<code>MONGODB_URI</code>)
 
 ### Deploy
 
@@ -55,6 +57,8 @@ zip -r function.zip index.mjs openai.mjs utils.mjs
     - Escolha o arquivo <code>function.zip</code> criado anteriormente
 4. <b>Configurar variáveis de ambiente:</b>
     - <code>OPENAI_API_KEY</code>: sua chave da OpenAI
+    - <code>MONGODB_URI</code>: string de conexão do seu MongoDB Atlas ou instância
+    - (Opcional) <code>MONGODB_DB</code>: nome do banco (default: <code>recipeimproviser</code>)
     - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
 </details>
 
@@ -71,6 +75,59 @@ zip -r function.zip index.mjs openai.mjs utils.mjs
     - <code>POST /recipe</code> (endpoint principal)
 4. Após criação:
     - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
+</details>
+
+<details>
+<summary><b>Como usar Lambda Layer para dependências (node_modules)</b></summary>
+
+<b>1. Crie a pasta do layer:</b>
+
+```powershell
+mkdir nodejs
+Copy-Item -Recurse -Force .\node_modules .\nodejs\
+Copy-Item -Force .\package.json .\nodejs\
+```
+
+<b>2. Compacte a pasta nodejs:</b>
+
+```powershell
+Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
+```
+
+<b>3. No console AWS Lambda:</b>
+   - Vá em "Layers" > "Create layer"
+   - Faça upload do <code>layer.zip</code>
+   - Escolha o runtime Node.js 18.x ou superior
+<b>4. Anexe o layer à sua função Lambda</b>
+<b>5. No deploy da função, NÃO inclua node_modules</b> (apenas seus arquivos .mjs e package.json)
+
+Assim, sua função Lambda usará as dependências do layer, mantendo o deploy enxuto e rápido!
+</details>
+
+<hr/>
+
+## 💾 Persistência no MongoDB
+
+Cada receita gerada é salva automaticamente na coleção <code>recipes</code> do MongoDB, junto com informações de estilo, dieta, ingredientes e data de criação.
+
+<details>
+<summary><b>Exemplo de documento salvo</b></summary>
+
+```json
+{
+  "title": "Macarrão ao Molho de Tomate e Queijo",
+  "servings": 2,
+  "time_minutes": 25,
+  "ingredients_used": ["200g de macarrão", ...],
+  "steps": ["1. Cozinhe o macarrão...", ...],
+  "tips": ["Para um toque especial..."],
+  "warnings": ["Certifique-se de..."],
+  "style": "gourmet",
+  "diet": "vegetarian",
+  "requested_ingredients": ["tomate", "queijo", "macarrão"],
+  "createdAt": "2025-09-10T19:00:00.000Z"
+}
+```
 </details>
 
 <hr/>
@@ -137,7 +194,6 @@ zip -r function.zip index.mjs openai.mjs utils.mjs
 
 <hr/>
 
-
 ## ⚠️ Limitações e Dicas
 
 ### Fluxo Síncrono Atual
@@ -148,12 +204,15 @@ flowchart TD
       B -->|2. Roteia| C(Lambda)
       C -->|3. Processa entrada| D(OpenAI API)
       D -->|4. Gera receita| C
-      C -->|5. Formata resposta| B
-      B -->|6. Retorna HTTP| A
+      C -->|5. Salva no MongoDB| E(MongoDB)
+      E -->|6. Confirmação| C
+      C -->|7. Formata resposta| B
+      B -->|8. Retorna HTTP| A
     
       subgraph Problema
          C
          D
+         E
       end
       Problema:::warning
 
@@ -163,7 +222,7 @@ flowchart TD
 <details>
 <summary><b>Por que isso é um problema?</b></summary>
 
-- A função Lambda fica <b>bloqueada</b> esperando a resposta do ChatGPT (média ~7,5s).
+- A função Lambda fica <b>bloqueada</b> esperando a resposta do ChatGPT <b>e do MongoDB</b> (média ~7,5s ou mais).
 - Isso aumenta o <b>custo</b> (Lambda cobra por duração) e o <b>tempo de espera</b> do usuário.
 - Para grandes volumes, pode causar lentidão e esgotar recursos.
 
@@ -192,5 +251,3 @@ Para produção, considere:
    Se curtiu o projeto, dê uma estrela! ⭐
 </div>
 </hr>
-
-
