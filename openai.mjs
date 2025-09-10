@@ -1,3 +1,4 @@
+import https from "https";
 function buildSystemPrompt({ style, diet }) {
   const styleDesc =
     {
@@ -31,10 +32,12 @@ Gere UMA receita que caiba em ~20-30 minutos, com 4-8 passos.`;
 
 export async function callOpenAI({ style, diet, ingredients, servings }) {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY ausente");
+  if (!apiKey) throw new Error("Variável de ambiente OPENAI_API_KEY ausente");
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 8000);
+
+  const agent = new https.Agent({ keepAlive: true });
 
   try {
     const payload = {
@@ -62,16 +65,29 @@ export async function callOpenAI({ style, diet, ingredients, servings }) {
       signal: controller.signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
+    if (!res.ok) throw new Error(`Erro na resposta da OpenAI: código ${res.status}`);
 
-    const data = await res.json();
+const data = await res.json();
 
     const text = data?.choices?.[0]?.message?.content?.trim() || "{}";
-
-    return JSON.parse(text.replace(/```json|```/g, ""));
+  console.log("Resposta bruta da OpenAI:", text);
+    try {
+      return JSON.parse(text.replace(/```json|```/g, ""));
+    } catch (e) {
+  console.error("Erro ao interpretar o JSON retornado pela OpenAI:", text);
+  throw new Error("A resposta da OpenAI não está em JSON válido. Tente novamente.");
+    }
+  } catch (err) {
+    if (err.name === "AbortError") {
+  throw new Error("A chamada para a OpenAI excedeu o tempo limite. Tente novamente em alguns segundos.");
+    }
+    throw err;
   } finally {
     clearTimeout(t);
   }
 }
+
+
+
 
 
