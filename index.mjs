@@ -1,5 +1,6 @@
 import { json, CORS, STYLES, DIETS } from "./utils.mjs";
 import { callOpenAI } from "./openai.mjs";
+import { saveRecipe } from "./database.mjs";
 
 export const handler = async (event) => {
   const method =
@@ -8,7 +9,7 @@ export const handler = async (event) => {
   const path = event?.requestContext?.http?.path || event?.path || "/";
 
   if (method === "OPTIONS") {
-    return { statusCode: 204, headers: CORS, body: "" };
+    return { statusCode: 204, body: "" };
   }
 
   if (method === "GET" && path === "/health") {
@@ -99,6 +100,18 @@ export const handler = async (event) => {
       tips: Array.isArray(result?.tips) ? result.tips : [],
       warnings: Array.isArray(result?.warnings) ? result.warnings : [],
     };
+
+    try {
+      await saveRecipe({
+        ...response,
+        style,
+        diet,
+        requested_ingredients: ingredients,
+        createdAt: new Date()
+      });
+    } catch (dbErr) {
+      console.error("Erro ao Salvar no MongoDB:", dbErr);
+    }
 
     console.log("Recipe generated:", {
       title: response.title,
