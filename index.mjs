@@ -1,4 +1,4 @@
-import { json, CORS, STYLES, DIETS } from "./utils.mjs";
+import { json, STYLES, DIETS } from "./utils.mjs";
 import { callOpenAI } from "./openai.mjs";
 import { saveRecipe } from "./database.mjs";
 
@@ -113,13 +113,13 @@ export const handler = async (event) => {
       console.error("Erro ao Salvar no MongoDB:", dbErr);
     }
 
-    console.log("Recipe generated:", {
+    console.log("Receita gerada:", {
       title: response.title,
       servings: response.servings,
     });
     return json(200, response);
   } catch (err) {
-    console.error("OpenAI call failed:", err);
+    console.error("Chamada a OpenAI falhou:", err);
     return json(502, { error: "Falha ao gerar a receita. Tente novamente." });
   }
 };
