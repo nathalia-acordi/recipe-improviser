@@ -78,9 +78,9 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 <details>
 <summary><b>2. Crie um Lambda Layer para dependências (recomendado)</b></summary>
 
-1. Instale as dependências do projeto normalmente:
+1. Instale as dependências do projeto normalmente, incluindo o driver do MongoDB:
    ```bash
-   npm install
+   npm install mongodb
    ```
 2. Crie uma pasta chamada `nodejs` e mova o `node_modules` e o `package.json` para dentro dela:
    - <b>Windows (PowerShell):</b>
