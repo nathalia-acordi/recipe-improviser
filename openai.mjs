@@ -1,4 +1,3 @@
-import https from "https";
 function buildSystemPrompt({ style, diet }) {
   const styleDesc =
     {
@@ -37,7 +36,6 @@ export async function callOpenAI({ style, diet, ingredients, servings }) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 8000);
 
-  const agent = new https.Agent({ keepAlive: true });
 
   try {
     const payload = {
