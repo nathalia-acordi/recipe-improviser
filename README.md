@@ -35,13 +35,13 @@
 <b>Windows (PowerShell):</b>
 
 ```powershell
-Compress-Archive -Path index.mjs, openai.mjs -DestinationPath function.zip -Force
+Compress-Archive -Path index.mjs, openai.mjs, utils.mjs, database.mjs -DestinationPath function.zip -Force
 ```
 
 <b>macOS/Linux:</b>
 
 ```bash
-zip -r function.zip index.mjs openai.mjs 
+zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs
 ```
 </details>
 
