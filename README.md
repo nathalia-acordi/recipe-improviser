@@ -200,23 +200,26 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 
 ```mermaid
 flowchart TD
-      A[Usuário] -->|1. Envia requisição HTTP| B(API Gateway)
-      B -->|2. Roteia| C(Lambda)
-      C -->|3. Processa entrada| D(OpenAI API)
-      D -->|4. Gera receita| C
-      C -->|5. Salva no MongoDB| E(MongoDB)
-      E -->|6. Confirmação| C
-      C -->|7. Formata resposta| B
-      B -->|8. Retorna HTTP| A
-    
-      subgraph Problema
-         C
-         D
-         E
-      end
-      Problema:::warning
+   A[Usuário]:::user -->|1. Envia requisição HTTP| B(API Gateway):::gateway
+   B -->|2. Roteia| C(Lambda):::lambda
+   C -->|3. Processa entrada| D(OpenAI API):::openai
+   D -->|4. Gera receita| C
+   C -->|5. Salva no MongoDB| E(MongoDB):::mongo
+   E -->|6. Confirmação| C
+   C -->|7. Formata resposta| B
+   B -->|8. Retorna HTTP| A
 
-      classDef warning fill:#fff3cd,stroke:#e0a800,stroke-width:2px;
+   classDef user fill:#e3fcec,stroke:#2ecc40,stroke-width:2px,color:#222;
+   classDef gateway fill:#eaf6ff,stroke:#3498db,stroke-width:2px,color:#222;
+   classDef lambda fill:#fff3cd,stroke:#f1c40f,stroke-width:2px,color:#222;
+   classDef openai fill:#fce4ec,stroke:#e84393,stroke-width:2px,color:#222;
+   classDef mongo fill:#e8f5e9,stroke:#27ae60,stroke-width:2px,color:#222;
+
+   class A user;
+   class B gateway;
+   class C lambda;
+   class D openai;
+   class E mongo;
 ```
 
 <details>
