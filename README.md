@@ -30,81 +30,94 @@
 ### Deploy
 
 <details>
-<summary><b>1. Empacote o código</b></summary>
+<summary><b>1. Empacote seu código-fonte</b></summary>
+
+Inclua apenas os arquivos `.mjs` e `package.json` (NÃO inclua `node_modules` se for usar Lambda Layer):
 
 <b>Windows (PowerShell):</b>
 
 ```powershell
-Compress-Archive -Path index.mjs, openai.mjs, utils.mjs, database.mjs -DestinationPath function.zip -Force
+Compress-Archive -Path index.mjs,openai.mjs,utils.mjs,database.mjs,package.json -DestinationPath function.zip -Force
 ```
 
 <b>macOS/Linux:</b>
 
 ```bash
-zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs
+zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 ```
 </details>
 
 <details>
-<summary><b>2. Crie a função Lambda</b></summary>
+<summary><b>2. Crie um Lambda Layer para dependências (recomendado)</b></summary>
+
+1. Instale as dependências do projeto normalmente:
+   ```bash
+   npm install
+   ```
+2. Crie uma pasta chamada `nodejs` e mova o `node_modules` e o `package.json` para dentro dela:
+   - <b>Windows (PowerShell):</b>
+     ```powershell
+     mkdir nodejs
+     Copy-Item -Recurse -Force .\node_modules .\nodejs\
+     Copy-Item -Force .\package.json .\nodejs\
+     ```
+   - <b>macOS/Linux:</b>
+     ```bash
+     mkdir nodejs
+     cp -r node_modules nodejs/
+     cp package.json nodejs/
+     ```
+3. Compacte a pasta `nodejs`:
+   - <b>Windows (PowerShell):</b>
+     ```powershell
+     Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
+     ```
+   - <b>macOS/Linux:</b>
+     ```bash
+     cd nodejs && zip -r ../layer.zip .
+     cd ..
+     ```
+4. No console AWS Lambda:
+   - Vá em "Layers" > "Create layer"
+   - Faça upload do `layer.zip`
+   - Escolha o runtime Node.js 18.x ou superior
+5. Anexe o layer à sua função Lambda
+6. No deploy da função, NÃO inclua `node_modules` (apenas seus arquivos `.mjs` e `package.json`)
+
+> Só empacote o `node_modules` junto com o código principal se não for usar Layer (não recomendado para produção).
+</details>
+
+<details>
+<summary><b>3. Crie a função Lambda</b></summary>
 
 1. Acesse o <a href="https://console.aws.amazon.com/lambda/" target="_blank"><b>Console AWS Lambda</b></a>
-2. <b>Create function</b> → "Author from scratch":
-    - 🔧 <b>Runtime:</b> Node.js 22.x
-    - 📛 <b>Nome:</b> <code>recipe-improviser</code>
-3. <b>Upload do pacote:</b>
-    - Selecione "Upload from" → ".zip file"
-    - Escolha o arquivo <code>function.zip</code> criado anteriormente
-4. <b>Configurar variáveis de ambiente:</b>
-    - <code>OPENAI_API_KEY</code>: sua chave da OpenAI
-    - <code>MONGODB_URI</code>: string de conexão do seu MongoDB Atlas ou instância
-    - (Opcional) <code>MONGODB_DB</code>: nome do banco (default: <code>recipeimproviser</code>)
-    - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
+2. Clique em "Create function" → "Author from scratch":
+   - Runtime: Node.js 22.x
+   - Nome: <code>recipe-improviser</code>
+3. Upload do pacote:
+   - Selecione "Upload from" → ".zip file"
+   - Escolha o arquivo <code>function.zip</code> criado anteriormente
+4. Configurar variáveis de ambiente:
+   - <code>OPENAI_API_KEY</code>: sua chave da OpenAI
+   - <code>MONGODB_URI</code>: string de conexão do seu MongoDB Atlas ou instância
+   - (Opcional) <code>MONGODB_DB</code>: nome do banco (default: <code>recipeimproviser</code>)
+   - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
 </details>
 
 <details>
-<summary><b>3. Configure o API Gateway</b></summary>
+<summary><b>4. Configure o API Gateway</b></summary>
 
 1. Na função Lambda criada:
-    - Clique em <b>Add trigger</b>
+   - Clique em <b>Add trigger</b>
 2. Selecione <b>API Gateway</b>:
-    - <b>Tipo:</b> HTTP API
-    - <b>Segurança:</b> Open (para desenvolvimento)
+   - <b>Tipo:</b> HTTP API
+   - <b>Segurança:</b> Open (para desenvolvimento)
 3. <b>Configurar rotas:</b>
-    - <code>GET /health</code> (healthcheck)
-    - <code>POST /recipe</code> (endpoint principal)
+   - <code>GET /health</code> (healthcheck)
+   - <code>POST /recipe</code> (endpoint principal)
 4. Após criação:
-    - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
+   - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
 </details>
-
-<details>
-<summary><b>Como usar Lambda Layer para dependências (node_modules)</b></summary>
-
-<b>1. Crie a pasta do layer:</b>
-
-```powershell
-mkdir nodejs
-Copy-Item -Recurse -Force .\node_modules .\nodejs\
-Copy-Item -Force .\package.json .\nodejs\
-```
-
-<b>2. Compacte a pasta nodejs:</b>
-
-```powershell
-Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
-```
-
-<b>3. No console AWS Lambda:</b>
-   - Vá em "Layers" > "Create layer"
-   - Faça upload do <code>layer.zip</code>
-   - Escolha o runtime Node.js 18.x ou superior
-<b>4. Anexe o layer à sua função Lambda</b>
-<b>5. No deploy da função, NÃO inclua node_modules</b> (apenas seus arquivos .mjs e package.json)
-
-Assim, sua função Lambda usará as dependências do layer, mantendo o deploy enxuto e rápido!
-</details>
-
-<hr/>
 
 ## 💾 Persistência no MongoDB
 
