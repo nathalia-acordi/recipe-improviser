@@ -18,6 +18,34 @@
 
 <hr/>
 
+## 🗂️ O que faz cada arquivo principal?
+
+<table>
+   <tr>
+      <th align="left">Arquivo</th>
+      <th align="left">Função</th>
+   </tr>
+   <tr>
+      <td><b>index.mjs</b></td>
+      <td>Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados.</td>
+   </tr>
+   <tr>
+      <td><b>openai.mjs</b></td>
+      <td>Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida.</td>
+   </tr>
+   <tr>
+      <td><b>database.mjs</b></td>
+      <td>Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção <code>recipes</code>.</td>
+   </tr>
+   <tr>
+      <td><b>utils.mjs</b></td>
+      <td>Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização.</td>
+   </tr>
+</table>
+
+
+<hr/>
+
 ## 🚀 Como usar
 
 ### Pré-requisitos
