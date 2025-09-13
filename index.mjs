@@ -2,43 +2,38 @@ import { json, STYLES, DIETS } from "./utils.mjs";
 import { callOpenAI } from "./openai.mjs";
 import { saveRecipe } from "./database.mjs";
 
-export const handler = async (event) => {
-  const method =
-    event?.requestContext?.http?.method || event?.httpMethod || "GET";
+export const handler = async (event, context) => {
+  // Evita que a Lambda espere a conexão do MongoDB ser fechada
+  if (context) context.callbackWaitsForEmptyEventLoop = false;
 
+  // Detecta método e rota
+  const method = event?.requestContext?.http?.method || event?.httpMethod || "GET";
   const path = event?.requestContext?.http?.path || event?.path || "/";
 
-  if (method === "OPTIONS") {
-    return { statusCode: 204, body: "" };
-  }
-
+  // Healthcheck
   if (method === "GET" && path === "/health") {
     return json(200, { ok: true, service: "recipe-api", version: "1.0.0" });
   }
 
+  // Só aceita POST /recipe
   if (!(method === "POST" && path === "/recipe")) {
     return json(404, { error: "Rota não encontrada", method, path });
   }
 
+  // Parse do body
   let body;
   try {
-    body =
-      typeof event.body === "string"
-        ? JSON.parse(event.body)
-        : event.body || {};
+    body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
   } catch (e) {
     console.error("JSON parse error:", e);
     return json(400, {
-      error:
-        "Body inválido. Envie JSON válido no Content-Type application/json.",
+      error: "Body inválido. Envie JSON válido no Content-Type application/json.",
     });
   }
 
+  // Validação dos ingredientes
   const ingredients = Array.isArray(body.ingredients)
-    ? body.ingredients
-        .map(String)
-        .map((s) => s.trim())
-        .filter(Boolean)
+    ? body.ingredients.map(String).map((s) => s.trim()).filter(Boolean)
     : [];
   if (ingredients.length === 0) {
     return json(400, {
@@ -46,6 +41,7 @@ export const handler = async (event) => {
     });
   }
 
+  // Validação de porções, estilo e dieta
   const servings = Number(body.servings || 2);
   const style = (body.style || "simple").toLowerCase();
   const diet = (body.diet || "none").toLowerCase();
@@ -61,6 +57,7 @@ export const handler = async (event) => {
     });
   }
 
+  // Limite de tamanho para ingredientes (proteção demo)
   const rawSize = ingredients.join(",").length;
   if (rawSize > 600) {
     return json(413, {
@@ -68,6 +65,7 @@ export const handler = async (event) => {
     });
   }
 
+  // Modo mock para testes locais
   if (process.env.SKIP_OPENAI === "1") {
     return json(200, {
       title: "Receita fake para teste (mock)",
@@ -84,9 +82,12 @@ export const handler = async (event) => {
     });
   }
 
+  // Chamada principal
   try {
     const result = await callOpenAI({ style, diet, ingredients, servings });
+    console.log("Resultado bruto da OpenAI:", result);
 
+    // Monta resposta padronizada
     const response = {
       title: result?.title ?? "Receita improvisada",
       servings: result?.servings ?? servings,
@@ -101,17 +102,16 @@ export const handler = async (event) => {
       warnings: Array.isArray(result?.warnings) ? result.warnings : [],
     };
 
-    try {
-      await saveRecipe({
-        ...response,
-        style,
-        diet,
-        requested_ingredients: ingredients,
-        createdAt: new Date()
-      });
-    } catch (dbErr) {
-      console.error("Erro ao Salvar no MongoDB:", dbErr);
-    }
+    // Salva receita no MongoDB (não bloqueia resposta)
+    saveRecipe({
+      ...response,
+      style,
+      diet,
+      requested_ingredients: ingredients,
+      createdAt: new Date(),
+    }).catch((dbErr) => {
+      console.error("Erro ao salvar no MongoDB:", dbErr);
+    });
 
     console.log("Receita gerada:", {
       title: response.title,
@@ -119,7 +119,10 @@ export const handler = async (event) => {
     });
     return json(200, response);
   } catch (err) {
-    console.error("Chamada a OpenAI falhou:", err);
+    console.error("Chamada à OpenAI falhou:", err);
+    if (process.env.NODE_ENV === "development") {
+      return json(502, { error: "Falha ao gerar a receita.", details: String(err && err.stack || err) });
+    }
     return json(502, { error: "Falha ao gerar a receita. Tente novamente." });
   }
 };
