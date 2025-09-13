@@ -1,26 +1,12 @@
-# 🥘 Recipe Improviser
-
-
 <div align="center">
 
-Gere receitas criativas a partir dos ingredientes que você tem em casa!
+# 🥘 Recipe Improviser
 
-API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persistência automática no MongoDB.
+<b>Gere receitas criativas a partir dos ingredientes que você tem em casa!</b><br>
+<sub>API serverless (AWS Lambda + API Gateway) • ChatGPT (OpenAI) • MongoDB</sub>
 
 </div>
 
----
-
-## 🗂️ O que faz cada arquivo principal?
-
-| Arquivo        | Função |
-| -------------- | ------ |
-| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
-| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
-| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
-| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
-
----
 
 ## ✨ Funcionalidades
 
@@ -31,6 +17,18 @@ API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persis
 - 🧪 <b>Modo offline</b> para testes (ignora chamada à OpenAI)
 - 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
+
+---
+## 🗂️ O que faz cada arquivo?
+
+| Arquivo        | Função |
+| -------------- | ------ |
+| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
+| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
+| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
+| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
+
+
 
 ---
 
@@ -124,6 +122,7 @@ Assim, sua função Lambda usará as dependências do layer, mantendo o deploy e
 </details>
 
 
+
 ---
 
 ## 💾 Persistência no MongoDB
@@ -164,53 +163,101 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 <summary><b>Resposta</b></summary>
 
 ```json
-{ "ok": true }
-```
-</details>
 
-### 🍲 Gerar Receita
+## 🧪 Quer testar pelo console da AWS?
 
-- <b>Método:</b> <code>POST</code>
-- <b>Endpoint:</b> <code>/recipe</code>
+Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
 
 <details>
-<summary><b>Body de exemplo</b></summary>
+<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
 
 ```json
 {
-   "ingredients": ["tomate", "queijo", "macarrão"],
-   "servings": 2,
-   "style": "gourmet",
-   "diet": "vegetarian"
+   "requestContext": {
+      "http": {
+         "method": "GET",
+         "path": "/health"
+      }
+   }
 }
 ```
+
 </details>
 
 <details>
-<summary><b>Resposta</b></summary>
+<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
 
 ```json
 {
-   "title": "Macarrão ao Molho de Tomate e Queijo",
-   "servings": 2,
-   "time_minutes": 25,
-   "ingredients_used": [
-      "200g de macarrão",
-      "2 tomates maduros",
-      "100g de queijo (pode ser muçarela ou queijo parmesão)"
-   ],
-   "steps": [
-      "1. Cozinhe o macarrão em água salgada fervente até ficar al dente...",
-      "...etc"
-   ],
-   "tips": [
-      "Para um toque especial, adicione manjericão fresco ou orégano ao molho."
-   ],
-   "warnings": [
-      "Certifique-se de cozinhar o macarrão até que esteja completamente cozido."
-   ]
+   "requestContext": {
+      "http": {
+         "method": "POST",
+         "path": "/recipe"
+      }
+   },
+   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
+   "headers": {
+      "Content-Type": "application/json"
+   }
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
+
+Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
+Ideal para validar integração, deploy e persistência no MongoDB sem custo!
+
+</details>
+
+
+## 🧪 Quer testar pelo console da AWS?
+
+Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
+
+<details>
+<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
+
+```json
+{
+   "requestContext": {
+      "http": {
+         "method": "GET",
+         "path": "/health"
+      }
+   }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
+
+```json
+{
+   "requestContext": {
+      "http": {
+         "method": "POST",
+         "path": "/recipe"
+      }
+   },
+   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
+   "headers": {
+      "Content-Type": "application/json"
+   }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
+
+Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
+Ideal para validar integração, deploy e persistência no MongoDB sem custo!
 </details>
 
 <hr/>
@@ -275,3 +322,7 @@ Para produção, considere:
    Se curtiu o projeto, dê uma estrela! ⭐
 </div>
 </hr>
+
+---
+
+
