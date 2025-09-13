@@ -1,27 +1,50 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
 
-// URI de conexão e nome do banco, vindos das variáveis de ambiente
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI; 
 const dbName = process.env.MONGODB_DB || "recipeimproviser";
 
-// Cliente MongoDB reutilizável (singleton)
-let client;
+const recipeSchema = new mongoose.Schema({
+  title: String,
+  servings: Number,
+  time_minutes: Number,
+  ingredients_used: [String],
+  steps: [String],
+  tips: [String],
+  warnings: [String],
+  style: String,
+  diet: String,
+  requested_ingredients: [String]
+}, { timestamps: true });
 
-// Retorna uma instância conectada do MongoClient (reutiliza se já existir)
-export async function getMongoClient() {
-  if (!client || !client.topology?.isConnected()) {
-    client = new MongoClient(uri);
-    await client.connect();
-  }
-  return client;
+// Singleton para evitar múltiplas conexões
+let Recipe;
+if (mongoose.models.Recipe) {
+  Recipe = mongoose.model("Recipe");
+} else {
+  Recipe = mongoose.model("Recipe", recipeSchema);
 }
 
-// Salva uma receita na coleção "recipes" do banco
+export async function connectMongoose() {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await mongoose.connect(uri, { dbName, serverSelectionTimeoutMS: 5000 });
+      console.log("[Mongoose] Conectado com sucesso!");
+    } catch (err) {
+      console.error("[Mongoose] Erro ao conectar:", err);
+      throw err;
+    }
+  }
+}
+
 export async function saveRecipe(recipe) {
-  const cli = await getMongoClient(); // obtém conexão
-  const db = cli.db(dbName); // seleciona banco
-  const col = db.collection("recipes"); // seleciona coleção
-  // Insere a receita (adiciona createdAt)
-  const result = await col.insertOne({ ...recipe, createdAt: new Date() });
-  return result.insertedId; // retorna o ID inserido
+  try {
+    await connectMongoose();
+    const doc = new Recipe(recipe);
+    await doc.save();
+    console.log("[Mongoose] Receita salva com sucesso! ID:", doc._id);
+    return doc._id;
+  } catch (err) {
+    console.error("[Mongoose] Erro ao salvar receita:", err);
+    throw err;
+  }
 }
