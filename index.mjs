@@ -102,13 +102,13 @@ export const handler = async (event, context) => {
       warnings: Array.isArray(result?.warnings) ? result.warnings : [],
     };
 
+
     // Salva receita no MongoDB (não bloqueia resposta)
     saveRecipe({
       ...response,
       style,
       diet,
-      requested_ingredients: ingredients,
-      createdAt: new Date(),
+      requested_ingredients: ingredients
     }).catch((dbErr) => {
       console.error("Erro ao salvar no MongoDB:", dbErr);
     });

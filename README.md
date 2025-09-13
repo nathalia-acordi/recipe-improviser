@@ -1,3 +1,5 @@
+
+
 <div align="center">
 
 # 🥘 Recipe Improviser
@@ -6,6 +8,19 @@
 <sub>API serverless (AWS Lambda + API Gateway) • ChatGPT (OpenAI) • MongoDB</sub>
 
 </div>
+
+---
+
+
+## 🗂️ O que faz cada arquivo principal?
+
+| Arquivo        | Função |
+| -------------- | ------ |
+| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
+| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
+| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
+| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
+
 
 
 ## ✨ Funcionalidades
@@ -17,17 +32,6 @@
 - 🧪 <b>Modo offline</b> para testes (ignora chamada à OpenAI)
 - 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
-
----
-## 🗂️ O que faz cada arquivo?
-
-| Arquivo        | Função |
-| -------------- | ------ |
-| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
-| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
-| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
-| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
-
 
 
 ---
@@ -79,7 +83,9 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 </details>
 
 
+
 <details>
+<summary><b>3. Configure o API Gateway</b></summary>
 <summary><b>3. Configure o API Gateway</b></summary>
 
 1. Na função Lambda criada:
@@ -125,6 +131,9 @@ Assim, sua função Lambda usará as dependências do layer, mantendo o deploy e
 
 ---
 
+
+---
+
 ## 💾 Persistência no MongoDB
 
 Cada receita gerada é salva automaticamente na coleção <code>recipes</code> do MongoDB, junto com informações de estilo, dieta, ingredientes e data de criação.
@@ -149,6 +158,8 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 ```
 </details>
 
+
+---
 
 ---
 
@@ -210,8 +221,6 @@ Você pode simular requisições diretamente pelo console da AWS Lambda usando o
 Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
 Ideal para validar integração, deploy e persistência no MongoDB sem custo!
 
-</details>
-
 
 ## 🧪 Quer testar pelo console da AWS?
 
@@ -258,7 +267,90 @@ Você pode simular requisições diretamente pelo console da AWS Lambda usando o
 
 Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
 Ideal para validar integração, deploy e persistência no MongoDB sem custo!
+
 </details>
+
+
+## 🧪 Quer testar pelo console da AWS?
+
+## 🧪 Quer testar pelo console da AWS?
+
+Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
+Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
+
+<details>
+<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
+<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
+
+```json
+{
+   "requestContext": {
+      "http": {
+         "method": "GET",
+         "path": "/health"
+      }
+   }
+   "requestContext": {
+      "http": {
+         "method": "GET",
+         "path": "/health"
+      }
+   }
+}
+```
+
+
+</details>
+
+<details>
+<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
+<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
+
+```json
+{
+   "requestContext": {
+      "http": {
+         "method": "POST",
+         "path": "/recipe"
+      }
+   },
+   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
+   "headers": {
+      "Content-Type": "application/json"
+   }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
+
+Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
+Ideal para validar integração, deploy e persistência no MongoDB sem custo!
+   "requestContext": {
+      "http": {
+         "method": "POST",
+         "path": "/recipe"
+      }
+   },
+   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
+   "headers": {
+      "Content-Type": "application/json"
+   }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
+
+Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
+Ideal para validar integração, deploy e persistência no MongoDB sem custo!
+</details>
+
+---
 
 <hr/>
 
@@ -324,5 +416,6 @@ Para produção, considere:
 </hr>
 
 ---
+
 
 
