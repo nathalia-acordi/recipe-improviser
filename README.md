@@ -1,5 +1,3 @@
-
-
 <div align="center">
 
 # 🥘 Recipe Improviser
@@ -12,17 +10,6 @@
 ---
 
 
-## 🗂️ O que faz cada arquivo principal?
-
-| Arquivo        | Função |
-| -------------- | ------ |
-| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
-| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
-| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
-| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
-
-
-
 ## ✨ Funcionalidades
 
 - 🍳 <b>Geração de receitas</b> a partir de ingredientes informados
@@ -33,24 +20,36 @@
 - 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
 
+---
+
+## 🗂️ O que faz cada arquivo?
+
+| Arquivo        | Função |
+| -------------- | ------ |
+| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
+| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
+| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
+| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
 
 ---
 
 ## 🚀 Como usar
 
+
 ### Pré-requisitos
 
 - Conta AWS (Lambda + API Gateway)
-- Node.js 18+
+- Node.js 22.x (igual ao runtime da Lambda)
 - Chave da OpenAI (`OPENAI_API_KEY`)
 - Instância ou cluster MongoDB acessível pela Lambda (`MONGODB_URI`)
 
 ### Deploy
 
+
 <details>
 <summary><b>1. Empacote seu código-fonte</b></summary>
 
-Inclua apenas os arquivos `.mjs` e `package.json` (NÃO inclua `node_modules` se for usar Lambda Layer):
+Inclua apenas os arquivos `.mjs` e `package.json` (NÃO inclua `node_modules`, usaremos Lambda Layer):
 
 <b>Windows (PowerShell):</b>
 
@@ -66,6 +65,53 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 </details>
 
 <details>
+<summary><b>2. Crie a Lambda Layer com Mongoose</b></summary>
+
+
+<b>1. Crie a pasta do layer e instale o Mongoose:</b>
+
+<b>Windows (PowerShell):</b>
+```powershell
+mkdir nodejs
+cd nodejs
+npm init -y
+npm install mongoose@8.18.1
+cd ..
+```
+
+<b>macOS/Linux:</b>
+```bash
+mkdir nodejs
+cd nodejs
+npm init -y
+npm install mongoose@8.18.1
+cd ..
+```
+
+
+<b>2. Compacte a pasta nodejs (ela deve estar na raiz do zip!):</b>
+
+<b>Windows (PowerShell):</b>
+```powershell
+Compress-Archive -Path .\nodejs -DestinationPath layer.zip -Force
+```
+
+<b>macOS/Linux:</b>
+```bash
+zip -r layer.zip nodejs
+```
+
+<b>3. No console AWS Lambda:</b>
+   - Vá em "Layers" > "Create layer"
+   - Faça upload do <code>layer.zip</code>
+   - Escolha o runtime Node.js 22.x
+<b>4. Anexe a Layer à sua função Lambda</b>
+<b>5. No deploy da função, NÃO inclua node_modules</b> (apenas seus arquivos .mjs e package.json)
+
+Assim, sua função Lambda usará o Mongoose do layer, mantendo o deploy enxuto e rápido!
+</details>
+
+<details>
 <summary><b>2. Crie a função Lambda</b></summary>
 
 1. Acesse o <a href="https://console.aws.amazon.com/lambda/" target="_blank"><b>Console AWS Lambda</b></a>
@@ -77,15 +123,15 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
    - Escolha o arquivo <code>function.zip</code> criado anteriormente
 4. Configurar variáveis de ambiente:
    - <code>OPENAI_API_KEY</code>: sua chave da OpenAI
-   - <code>MONGODB_URI</code>: string de conexão do seu MongoDB Atlas ou instância
+   - <code>MONGO_URI</code>: string de conexão do seu MongoDB Atlas ou instância
    - (Opcional) <code>MONGODB_DB</code>: nome do banco (default: <code>recipeimproviser</code>)
    - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
 </details>
 
 
 
+
 <details>
-<summary><b>3. Configure o API Gateway</b></summary>
 <summary><b>3. Configure o API Gateway</b></summary>
 
 1. Na função Lambda criada:
@@ -100,43 +146,13 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
    - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
 </details>
 
-<details>
-<summary><b>Como usar Lambda Layer para dependências (node_modules)</b></summary>
-
-<b>1. Crie a pasta do layer:</b>
-
-```powershell
-mkdir nodejs
-Copy-Item -Recurse -Force .\node_modules .\nodejs\
-Copy-Item -Force .\package.json .\nodejs\
-```
-
-<b>2. Compacte a pasta nodejs:</b>
-
-```powershell
-Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
-```
-
-<b>3. No console AWS Lambda:</b>
-   - Vá em "Layers" > "Create layer"
-   - Faça upload do <code>layer.zip</code>
-   - Escolha o runtime Node.js 18.x ou superior
-<b>4. Anexe o layer à sua função Lambda</b>
-<b>5. No deploy da função, NÃO inclua node_modules</b> (apenas seus arquivos .mjs e package.json)
-
-Assim, sua função Lambda usará as dependências do layer, mantendo o deploy enxuto e rápido!
-</details>
-
-
 
 ---
 
-
----
 
 ## 💾 Persistência no MongoDB
 
-Cada receita gerada é salva automaticamente na coleção <code>recipes</code> do MongoDB, junto com informações de estilo, dieta, ingredientes e data de criação.
+Cada receita gerada é salva automaticamente na coleção <code>recipes</code> do MongoDB, junto com informações de estilo, dieta, ingredientes e data de criação. O acesso ao banco é feito via Mongoose, utilizando uma Lambda Layer para as dependências.
 
 <details>
 <summary><b>Exemplo de documento salvo</b></summary>
@@ -161,8 +177,6 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 
 ---
 
----
-
 ## 📡 Endpoints
 
 ### 🩺 Healthcheck
@@ -175,52 +189,6 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 
 ```json
 
-## 🧪 Quer testar pelo console da AWS?
-
-Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
-
-<details>
-<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
-
-```json
-{
-   "requestContext": {
-      "http": {
-         "method": "GET",
-         "path": "/health"
-      }
-   }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
-
-```json
-{
-   "requestContext": {
-      "http": {
-         "method": "POST",
-         "path": "/recipe"
-      }
-   },
-   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
-   "headers": {
-      "Content-Type": "application/json"
-   }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
-
-Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
-Ideal para validar integração, deploy e persistência no MongoDB sem custo!
-
 
 ## 🧪 Quer testar pelo console da AWS?
 
@@ -268,91 +236,11 @@ Você pode simular requisições diretamente pelo console da AWS Lambda usando o
 Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
 Ideal para validar integração, deploy e persistência no MongoDB sem custo!
 
-</details>
-
-
-## 🧪 Quer testar pelo console da AWS?
-
-## 🧪 Quer testar pelo console da AWS?
-
-Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
-Você pode simular requisições diretamente pelo console da AWS Lambda usando os exemplos abaixo:
-
-<details>
-<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
-<summary><b>Exemplo de evento <code>GET /health</code></b></summary>
-
-```json
-{
-   "requestContext": {
-      "http": {
-         "method": "GET",
-         "path": "/health"
-      }
-   }
-   "requestContext": {
-      "http": {
-         "method": "GET",
-         "path": "/health"
-      }
-   }
-}
-```
-
-
-</details>
-
-<details>
-<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
-<summary><b>Exemplo de evento <code>POST /recipe</code></b></summary>
-
-```json
-{
-   "requestContext": {
-      "http": {
-         "method": "POST",
-         "path": "/recipe"
-      }
-   },
-   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
-   "headers": {
-      "Content-Type": "application/json"
-   }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
-
-Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
-Ideal para validar integração, deploy e persistência no MongoDB sem custo!
-   "requestContext": {
-      "http": {
-         "method": "POST",
-         "path": "/recipe"
-      }
-   },
-   "body": "{\"ingredients\":[\"tomate\",\"queijo\",\"macarrão\"],\"servings\":2,\"style\":\"gourmet\",\"diet\":\"vegetarian\"}",
-   "headers": {
-      "Content-Type": "application/json"
-   }
-}
-```
-
-</details>
-
-<details>
-<summary><b>Testar sem gastar créditos da OpenAI (<code>SKIP_OPENAI</code>)</b></summary>
-
-Se quiser testar sem consumir créditos da OpenAI, basta definir a variável de ambiente <code>SKIP_OPENAI=1</code> na configuração da Lambda. Assim, a função retorna uma receita mockada, sem chamar a API da OpenAI.<br><br>
-Ideal para validar integração, deploy e persistência no MongoDB sem custo!
 </details>
 
 ---
 
-<hr/>
+
 
 ## ⚠️ Limitações e Dicas
 
@@ -404,18 +292,18 @@ Para produção, considere:
 <div align="center">
    <h3>💬 Ficou com dúvidas, quer trocar ideias ou colaborar?</h3>
    <b>Entre em contato comigo!</b><br><br>
-   <a href="mailto:nathaliaccord@gmail.com" target="_blank">
+   <a href="mailto:nathaliaccord@gmail.com" target="_blank" style="display:inline-block;margin-bottom:8px;">
       <img src="https://img.shields.io/badge/E--mail-nathaliaccord@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="E-mail Badge"/>
-   </a>
-   <a href="https://www.linkedin.com/in/nath%C3%A1lia-acordi-0a564b223/" target="_blank">
+   </a><br>
+   <a href="https://www.linkedin.com/in/nath%C3%A1lia-acordi-0a564b223/" target="_blank" style="display:inline-block;margin-top:8px;">
       <img src="https://img.shields.io/badge/LinkedIn-Nathália%20Acordi-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
    </a>
    <br><br>
    Se curtiu o projeto, dê uma estrela! ⭐
-</div>
-</hr>
 
----
+</div>
+
+
 
 
 
