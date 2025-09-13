@@ -1,10 +1,14 @@
-<div align="center">
-   <h1>🥘 <strong>Recipe Improviser</strong></h1>
-   <p>Gere receitas criativas a partir dos ingredientes que você tem em casa!<br>
-   <b>API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persistência automática no MongoDB.</b></p>
-</div>
+# 🥘 Recipe Improviser
 
-<hr/>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/nathalia-acordi/recipe-improviser/main/logo.png" alt="Recipe Improviser logo" width="180"/>
+</p>
+
+Gere receitas criativas a partir dos ingredientes que você tem em casa!
+
+API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persistência automática no MongoDB.
+
+---
 
 ## ✨ Funcionalidades
 
@@ -16,44 +20,16 @@
 - 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
 
-<hr/>
-
-## 🗂️ O que faz cada arquivo principal?
-
-<table>
-   <tr>
-      <th align="left">Arquivo</th>
-      <th align="left">Função</th>
-   </tr>
-   <tr>
-      <td><b>index.mjs</b></td>
-      <td>Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados.</td>
-   </tr>
-   <tr>
-      <td><b>openai.mjs</b></td>
-      <td>Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida.</td>
-   </tr>
-   <tr>
-      <td><b>database.mjs</b></td>
-      <td>Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção <code>recipes</code>.</td>
-   </tr>
-   <tr>
-      <td><b>utils.mjs</b></td>
-      <td>Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização.</td>
-   </tr>
-</table>
-
-
-<hr/>
+---
 
 ## 🚀 Como usar
 
 ### Pré-requisitos
 
-- ☁️ Conta AWS (Lambda + API Gateway)
-- 🟩 Node.js 18+
-- 🤖 Chave da OpenAI (<code>OPENAI_API_KEY</code>)
-- 🍃 Instância ou cluster MongoDB acessível pela Lambda (<code>MONGODB_URI</code>)
+- Conta AWS (Lambda + API Gateway)
+- Node.js 18+
+- Chave da OpenAI (`OPENAI_API_KEY`)
+- Instância ou cluster MongoDB acessível pela Lambda (`MONGODB_URI`)
 
 ### Deploy
 
@@ -76,47 +52,7 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 </details>
 
 <details>
-<summary><b>2. Crie um Lambda Layer para dependências (recomendado)</b></summary>
-
-1. Instale as dependências do projeto normalmente, incluindo o driver do MongoDB:
-   ```bash
-   npm install mongodb
-   ```
-2. Crie uma pasta chamada `nodejs` e mova o `node_modules` e o `package.json` para dentro dela:
-   - <b>Windows (PowerShell):</b>
-     ```powershell
-     mkdir nodejs
-     Copy-Item -Recurse -Force .\node_modules .\nodejs\
-     Copy-Item -Force .\package.json .\nodejs\
-     ```
-   - <b>macOS/Linux:</b>
-     ```bash
-     mkdir nodejs
-     cp -r node_modules nodejs/
-     cp package.json nodejs/
-     ```
-3. Compacte a pasta `nodejs`:
-   - <b>Windows (PowerShell):</b>
-     ```powershell
-     Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
-     ```
-   - <b>macOS/Linux:</b>
-     ```bash
-     cd nodejs && zip -r ../layer.zip .
-     cd ..
-     ```
-4. No console AWS Lambda:
-   - Vá em "Layers" > "Create layer"
-   - Faça upload do `layer.zip`
-   - Escolha o runtime Node.js 18.x ou superior
-5. Anexe o layer à sua função Lambda
-6. No deploy da função, NÃO inclua `node_modules` (apenas seus arquivos `.mjs` e `package.json`)
-
-> Só empacote o `node_modules` junto com o código principal se não for usar Layer (não recomendado para produção).
-</details>
-
-<details>
-<summary><b>3. Crie a função Lambda</b></summary>
+<summary><b>2. Crie a função Lambda</b></summary>
 
 1. Acesse o <a href="https://console.aws.amazon.com/lambda/" target="_blank"><b>Console AWS Lambda</b></a>
 2. Clique em "Create function" → "Author from scratch":
@@ -146,6 +82,35 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
 4. Após criação:
    - Anote a <b>URL de invocação</b> (ex: <code>https://[id].execute-api.[region].amazonaws.com</code>)
 </details>
+
+<details>
+<summary><b>Como usar Lambda Layer para dependências (node_modules)</b></summary>
+
+<b>1. Crie a pasta do layer:</b>
+
+```powershell
+mkdir nodejs
+Copy-Item -Recurse -Force .\node_modules .\nodejs\
+Copy-Item -Force .\package.json .\nodejs\
+```
+
+<b>2. Compacte a pasta nodejs:</b>
+
+```powershell
+Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
+```
+
+<b>3. No console AWS Lambda:</b>
+   - Vá em "Layers" > "Create layer"
+   - Faça upload do <code>layer.zip</code>
+   - Escolha o runtime Node.js 18.x ou superior
+<b>4. Anexe o layer à sua função Lambda</b>
+<b>5. No deploy da função, NÃO inclua node_modules</b> (apenas seus arquivos .mjs e package.json)
+
+Assim, sua função Lambda usará as dependências do layer, mantendo o deploy enxuto e rápido!
+</details>
+
+<hr/>
 
 ## 💾 Persistência no MongoDB
 
@@ -295,3 +260,30 @@ Para produção, considere:
    Se curtiu o projeto, dê uma estrela! ⭐
 </div>
 </hr>
+
+---
+
+## 🗂️ O que faz cada arquivo principal?
+
+<table>
+   <tr>
+      <th align="left">Arquivo</th>
+      <th align="left">Função</th>
+   </tr>
+   <tr>
+      <td><b>index.mjs</b></td>
+      <td>Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados.</td>
+   </tr>
+   <tr>
+      <td><b>openai.mjs</b></td>
+      <td>Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida.</td>
+   </tr>
+   <tr>
+      <td><b>database.mjs</b></td>
+      <td>Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção <code>recipes</code>.</td>
+   </tr>
+   <tr>
+      <td><b>utils.mjs</b></td>
+      <td>Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização.</td>
+   </tr>
+</table>
