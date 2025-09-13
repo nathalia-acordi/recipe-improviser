@@ -1,12 +1,24 @@
 # 🥘 Recipe Improviser
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/nathalia-acordi/recipe-improviser/main/logo.png" alt="Recipe Improviser logo" width="180"/>
-</p>
+
+<div align="center">
 
 Gere receitas criativas a partir dos ingredientes que você tem em casa!
 
 API serverless (AWS Lambda + API Gateway) integrada ao ChatGPT (OpenAI) e persistência automática no MongoDB.
+
+</div>
+
+---
+
+## 🗂️ O que faz cada arquivo principal?
+
+| Arquivo        | Função |
+| -------------- | ------ |
+| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
+| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
+| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
+| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
 
 ---
 
@@ -68,8 +80,9 @@ zip -r function.zip index.mjs openai.mjs utils.mjs database.mjs package.json
    - (Opcional) <code>SKIP_OPENAI</code>: <code>1</code> para modo de teste
 </details>
 
+
 <details>
-<summary><b>4. Configure o API Gateway</b></summary>
+<summary><b>3. Configure o API Gateway</b></summary>
 
 1. Na função Lambda criada:
    - Clique em <b>Add trigger</b>
@@ -110,7 +123,8 @@ Compress-Archive -Path .\nodejs\* -DestinationPath layer.zip -Force
 Assim, sua função Lambda usará as dependências do layer, mantendo o deploy enxuto e rápido!
 </details>
 
-<hr/>
+
+---
 
 ## 💾 Persistência no MongoDB
 
@@ -136,7 +150,8 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 ```
 </details>
 
-<hr/>
+
+---
 
 ## 📡 Endpoints
 
@@ -260,30 +275,3 @@ Para produção, considere:
    Se curtiu o projeto, dê uma estrela! ⭐
 </div>
 </hr>
-
----
-
-## 🗂️ O que faz cada arquivo principal?
-
-<table>
-   <tr>
-      <th align="left">Arquivo</th>
-      <th align="left">Função</th>
-   </tr>
-   <tr>
-      <td><b>index.mjs</b></td>
-      <td>Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados.</td>
-   </tr>
-   <tr>
-      <td><b>openai.mjs</b></td>
-      <td>Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida.</td>
-   </tr>
-   <tr>
-      <td><b>database.mjs</b></td>
-      <td>Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção <code>recipes</code>.</td>
-   </tr>
-   <tr>
-      <td><b>utils.mjs</b></td>
-      <td>Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização.</td>
-   </tr>
-</table>
