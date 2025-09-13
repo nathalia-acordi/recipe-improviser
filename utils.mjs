@@ -3,7 +3,7 @@ export function json(statusCode, body) {
     statusCode,
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "*", // CORS
       "Access-Control-Allow-Methods": "*",
       "Access-Control-Allow-Headers": "*",
     },
@@ -11,6 +11,7 @@ export function json(statusCode, body) {
   };
 }
 
+// Estilos e dietas suportados
 export const STYLES = new Set([
   "simple",
   "funny",
