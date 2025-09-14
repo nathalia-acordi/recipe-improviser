@@ -10,6 +10,17 @@
 ---
 
 
+## 🗂️ O que faz cada arquivo principal?
+
+| Arquivo        | Função |
+| -------------- | ------ |
+| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
+| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
+| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
+| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
+
+
+
 ## ✨ Funcionalidades
 
 - 🍳 <b>Geração de receitas</b> a partir de ingredientes informados
@@ -20,16 +31,6 @@
 - 💾 <b>Salva receitas no MongoDB</b> automaticamente
 - 📦 <b>Deploy simples</b> em um único Lambda
 
----
-
-## 🗂️ O que faz cada arquivo?
-
-| Arquivo        | Função |
-| -------------- | ------ |
-| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
-| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
-| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
-| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
 
 ---
 
@@ -185,10 +186,57 @@ Cada receita gerada é salva automaticamente na coleção <code>recipes</code> d
 - <b>Endpoint:</b> <code>/health</code>
 
 <details>
-<summary><b>Resposta</b></summary>
+<summary><b>Exemplo de resposta</b></summary>
 
 ```json
+{
+   "status": "ok"
+}
+```
 
+</details>
+
+### 🍲 Gerar Receita
+
+- <b>Método:</b> <code>POST</code>
+- <b>Endpoint:</b> <code>/recipe</code>
+
+<details>
+<summary><b>Exemplo de payload e resposta</b></summary>
+
+<b>Payload (body):</b>
+```json
+{
+   "ingredients": ["tomate", "queijo", "macarrão"],
+   "servings": 2,
+   "style": "gourmet",
+   "diet": "vegetarian"
+}
+```
+
+<b>Resposta:</b>
+```json
+{
+   "title": "Macarrão ao Molho de Tomate e Queijo",
+   "servings": 2,
+   "time_minutes": 25,
+   "ingredients_used": ["200g de macarrão", "tomate", "queijo"],
+   "steps": [
+      "1. Cozinhe o macarrão conforme as instruções da embalagem.",
+      "2. Em uma panela, refogue o tomate picado.",
+      "3. Adicione o queijo e misture até derreter.",
+      "4. Misture o molho ao macarrão e sirva."
+   ],
+   "tips": ["Para um toque especial, adicione manjericão fresco."],
+   "warnings": ["Cuidado para não queimar o queijo."],
+   "style": "gourmet",
+   "diet": "vegetarian",
+   "requested_ingredients": ["tomate", "queijo", "macarrão"],
+   "createdAt": "2025-09-10T19:00:00.000Z"
+}
+```
+
+</details>
 
 ## 🧪 Quer testar pelo console da AWS?
 
