@@ -18,7 +18,7 @@
 ---
 
 
-## 🗂️ O que faz cada arquivo principal?
+## 🗂️ O que faz cada arquivo?
 
 | Arquivo        | Função |
 | -------------- | ------ |
