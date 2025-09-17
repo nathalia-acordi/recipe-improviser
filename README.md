@@ -3,7 +3,15 @@
 # 🥘 Recipe Improviser
 
 <b>Gere receitas criativas a partir dos ingredientes que você tem em casa!</b><br>
-<sub>API serverless (AWS Lambda + API Gateway) • ChatGPT (OpenAI) • MongoDB</sub>
+
+<!-- Badges lado a lado, centralizados e menores -->
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js Badge" height="22"/>
+  <img src="https://img.shields.io/badge/MongoDB%20Atlas-Cluster-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas Badge" height="22"/>
+  <img src="https://img.shields.io/badge/AWS%20Lambda-Serverless-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="AWS Lambda Badge" height="22"/>
+  <img src="https://img.shields.io/badge/AWS%20API%20Gateway-HTTP%20API-FF4F8B?style=for-the-badge&logo=amazonapigateway&logoColor=white" alt="API Gateway Badge" height="22"/>
+  <img src="https://img.shields.io/badge/OpenAI%20API-ChatGPT-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI API Badge" height="22"/>
+</p>
 
 </div>
 
