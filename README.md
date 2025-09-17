@@ -329,7 +329,7 @@ flowchart TD
 <details>
 <summary><b>Por que isso é um problema?</b></summary>
 
-- A função Lambda fica <b>bloqueada</b> esperando a resposta do ChatGPT <b>e do MongoDB</b> (média ~7,5s ou mais).
+- A função Lambda fica <b>bloqueada</b> esperando a resposta do ChatGPT <b>e do MongoDB</b> (média ~12s ou mais).
 - Isso aumenta o <b>custo</b> (Lambda cobra por duração) e o <b>tempo de espera</b> do usuário.
 - Para grandes volumes, pode causar lentidão e esgotar recursos.
 
@@ -337,9 +337,8 @@ flowchart TD
 
 Para produção, considere:
 - Processamento assíncrono (SQS + Lambda Worker)
-- Orquestração com Step Functions
-- Cache de receitas populares (DynamoDB/S3)
-- Streaming de respostas (quando disponível)
+- Aumentar memória da função Lambda (analise se vale a pena)
+- Diminuir tokens + deixar prompt para IA mais direto
 
 > <b>Veja também:</b><br>
 > No repositório <a href="https://github.com/nathalia-acordi/recipe-improviser-pipeline/" target="_blank"><b>recipe-improviser-pipeline</b></a> demonstro como resolver esse problema usando uma arquitetura assíncrona, tornando o fluxo mais escalável e eficiente para grandes volumes e respostas demoradas.
