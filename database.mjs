@@ -39,6 +39,9 @@ export async function connectMongoose() {
 export async function saveRecipe(recipe) {
   try {
     await connectMongoose();
+    // Log detalhado para debug: mostra estrutura e tipos do objeto recebido
+    console.log("[Mongoose][DEBUG] Dados recebidos para salvar:", JSON.stringify(recipe, null, 2));
+    console.log("[Mongoose][DEBUG] Tipos dos campos:", Object.fromEntries(Object.entries(recipe).map(([k,v]) => [k, Array.isArray(v) ? 'array' : typeof v])));
     const doc = new Recipe(recipe);
     await doc.save();
     console.log("[Mongoose] Receita salva com sucesso! ID:", doc._id);
