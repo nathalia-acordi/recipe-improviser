@@ -102,16 +102,24 @@ export const handler = async (event, context) => {
       warnings: Array.isArray(result?.warnings) ? result.warnings : [],
     };
 
-
-    // Salva receita no MongoDB (não bloqueia resposta)
-    saveRecipe({
+    // Salva receita no MongoDB (aguarda para garantir execução em ambiente Lambda)
+    console.log("[MongoDB][DEBUG] Chamando saveRecipe com:", {
       ...response,
       style,
       diet,
       requested_ingredients: ingredients
-    }).catch((dbErr) => {
-      console.error("Erro ao salvar no MongoDB:", dbErr);
     });
+    try {
+      await saveRecipe({
+        ...response,
+        style,
+        diet,
+        requested_ingredients: ingredients
+      });
+      console.log("[MongoDB][DEBUG] saveRecipe executado com sucesso");
+    } catch (dbErr) {
+      console.error("Erro ao salvar no MongoDB:", dbErr);
+    }
 
     console.log("Receita gerada:", {
       title: response.title,
