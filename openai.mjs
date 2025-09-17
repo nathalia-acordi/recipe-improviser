@@ -39,20 +39,31 @@ export async function callOpenAI({ style, diet, ingredients, servings }) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 15000);
 
+  /**
+   * Retorna a temperatura ideal para o modelo da OpenAI conforme o estilo desejado.
+   * Temperaturas mais altas deixam as respostas mais criativas/aleatórias.
+   */
+  function getTemperature(style) {
+    switch (style) {
+      case "funny": // Respostas engraçadas pedem mais criatividade
+      case "chaotic": // Respostas caóticas também
+        return 0.9;
+      case "gourmet": // Gourmet é criativo, mas menos exagerado
+        return 0.7;
+      default: // Outros estilos priorizam respostas mais seguras
+        return 0.4;
+    }
+  }
+
   try {
-  // Monta o payload para a API da OpenAI
-  const payload = {
+    // Monta o payload para a API da OpenAI
+    const payload = {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: buildSystemPrompt({ style, diet }) },
         { role: "user", content: buildUserPrompt({ ingredients, servings }) },
       ],
-      temperature:
-        style === "funny" || style === "chaotic"
-          ? 0.9
-          : style === "gourmet"
-          ? 0.7
-          : 0.4,
+      temperature: getTemperature(style),
       max_tokens: 500,
     };
 
@@ -107,7 +118,6 @@ export async function callOpenAI({ style, diet, ingredients, servings }) {
     clearTimeout(t);
   }
 }
-
 
 
 
