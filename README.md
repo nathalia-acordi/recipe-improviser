@@ -26,7 +26,17 @@
 | **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
 | **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
 | **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
-
+```mermaid
+flowchart TD
+    User[Usuário] -->|HTTP Request| index.mjs
+    index.mjs -->|Chama função| openai.mjs
+    openai.mjs -->|Requisição HTTP| OpenAI[API OpenAI]
+    OpenAI -->|Resposta| openai.mjs
+    openai.mjs -->|Retorna dados| index.mjs
+    index.mjs -->|Chama função| database.mjs
+    database.mjs -->|Salva no| MongoDB[(MongoDB)]
+    index.mjs -->|HTTP Response| User
+```
 
 
 ## ✨ Funcionalidades
