@@ -20,12 +20,12 @@
 
 ## 🗂️ O que faz cada arquivo?
 
-| Arquivo        | Função |
-| -------------- | ------ |
-| **index.mjs**  | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a OpenAI para gerar a receita e salva o resultado no banco de dados. |
-| **openai.mjs** | Responsável por montar os prompts (instruções) e fazer a chamada à API da OpenAI (ChatGPT), além de tratar e validar a resposta recebida. |
-| **database.mjs** | Gerencia a conexão com o MongoDB e salva as receitas geradas na coleção `recipes`. |
-| **utils.mjs**  | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
+| Arquivo         | Função                                                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **index.mjs**   | Ponto de entrada da API. Faz o roteamento das requisições, valida os dados recebidos, chama a função do openai.mjs para gerar a receita (que por sua vez faz a chamada à OpenAI) e salva o resultado no banco de dados. |
+| **openai.mjs**  | Responsável por montar os prompts (instruções), fazer a chamada HTTP à API da OpenAI (ChatGPT) e tratar/validar a resposta recebida. |
+| **database.mjs**| Gerencia a conexão com o MongoDB usando Mongoose, define o schema das receitas e implementa a função para salvar receitas na coleção `recipes`. |
+| **utils.mjs**   | Contém funções utilitárias (como resposta JSON padronizada) e listas de estilos e dietas aceitos, usadas para validação e padronização. |
 ```mermaid
 flowchart TD
     User[Usuário] -->|HTTP Request| index.mjs
