@@ -4,6 +4,11 @@
 
 <b>Gere receitas criativas a partir dos ingredientes que você tem em casa!</b><br>
 
+-[API](https://docs.google.com/presentation/d/1FPxqNwC08WnsGsqjjuIsUWitqTBlySGGT5NgC_PyOj4/edit?usp=sharing)
+
+
+
+
 <!-- Badges lado a lado, centralizados e menores -->
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js Badge" height="22"/>
