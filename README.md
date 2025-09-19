@@ -4,10 +4,6 @@
 
 <b>Gere receitas criativas a partir dos ingredientes que você tem em casa!</b><br>
 
--[API](https://docs.google.com/presentation/d/1FPxqNwC08WnsGsqjjuIsUWitqTBlySGGT5NgC_PyOj4/edit?usp=sharing)
-
-
-
 
 <!-- Badges lado a lado, centralizados e menores -->
 <p align="center">
